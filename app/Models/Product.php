@@ -27,6 +27,7 @@ class Product extends Model
         'description',
         'related_product',
         'status',
+        'druft'
     ];
 
     protected $casts = [
@@ -53,5 +54,13 @@ class Product extends Model
     public function childCategory()
     {
         return $this->belongsTo(ChildCategory::class, 'childCat_id');
+    }
+    public function productQtys()
+    {
+        return $this->hasMany(ProductQty::class);
+    }
+    public function seo()
+    {
+        return $this->hasOne(ProductSEO::class);
     }
 }

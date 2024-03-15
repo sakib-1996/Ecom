@@ -33,6 +33,7 @@ return new class extends Migration
             $table->longText('description')->nullable();
             $table->json('related_product')->nullable();
             $table->boolean('status')->default(false);
+            $table->boolean('druft')->default(false);
 
             $table->timestamps();
             $table->foreign('brand_id')->references('id')->on('brands')->onDelete('cascade')->onUpdate('cascade');

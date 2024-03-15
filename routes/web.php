@@ -74,4 +74,47 @@ Route::get('/admin/settings/color/delete/{id}', [SettingController::class, 'dest
 Route::get('/admin/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/admin/products/create', [ProductController::class, 'createProductPage'])->name('products.create');
 Route::post('/admin/products/create', [ProductController::class, 'createProduct']);
-Route::get('/admin/products/addQty/{productId}', [ProductController::class, 'addQty'])->name('products.addQty');
+
+Route::get('/admin/products/edit/{productId}', [ProductController::class, 'editeProductPage'])->name('editeProduct');
+
+Route::post('/admin/products/edit/{productId}', [ProductController::class, 'updateProduct']);
+
+Route::get('/admin/products/delete/{productId}', [ProductController::class, 'deleteProduct'])->name('deleteProduct');
+
+
+
+
+Route::post('/admin/products/druft/Update/{productId}', [ProductController::class, 'ProductDruftUpdate'])->name('products.druft.update');
+
+
+
+
+
+
+
+
+
+Route::get('/admin/products/addQty/{productId}', [ProductController::class, 'addQtyPage'])->name('products.addQty');
+Route::post('/admin/products/addQty/{productId}', [ProductController::class, 'addQty']);
+
+Route::get('/admin/products/QtyById/{qtyId}', [ProductController::class, 'QtyById']);
+Route::post('/admin/products/QtyUpdate', [ProductController::class, 'QtyUpdate'])->name('products.QtyUpdate');
+
+
+
+
+
+
+
+Route::post('/admin/products/Qty/druft/Update/{qtyId}', [ProductController::class, 'QtyDruftUpdate'])->name('qty.druft.update');
+
+
+
+
+
+
+
+
+Route::get('/admin/products/Qty/delete/{qtyId}', [ProductController::class, 'QtyDelete'])->name('Qty.delete');
+
+Route::get('/admin/products/{productId}', [ProductController::class, 'QtyDetails'])->name('products.QtyDetails');

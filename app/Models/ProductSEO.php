@@ -13,5 +13,10 @@ class ProductSEO extends Model
         'meta_des',
         'meta_img',
         'meta_slug',
+        'product_id'
     ];
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
 }
