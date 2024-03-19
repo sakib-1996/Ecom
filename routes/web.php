@@ -97,4 +97,4 @@ Route::get('/admin/products/discount/edit/{disId}', [DiscountController::class, 
 Route::post('/admin/products/discount/update', [DiscountController::class, 'updateDiscount'])->name('admin.updateDiscount');
 
 
-
+Route::get('/admin/hello', [SubCategoryController::class, 'hello']);

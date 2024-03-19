@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Carbon\Carbon;
 use App\Models\Category;
+use App\Models\Discount;
 use App\Models\SubCategory;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -95,5 +97,26 @@ class SubCategoryController extends Controller
 
         $notification = array('message' => 'Sub Category Deleted!', 'alert-type' => 'success');
         return redirect()->back()->with($notification);
+    }
+
+
+
+    public function hello()
+    {
+        $discounts = Discount::where('status', 1)->get();
+        $currentDateTime = Carbon::now();
+        foreach ($discounts as $discount) {
+            $startDateTime = Carbon::parse($discount->start_date);
+            $endDateTime = Carbon::parse($discount->end_date);
+
+            if ($currentDateTime === $startDateTime || $currentDateTime > $startDateTime) {
+                dd("hello");
+                $discount->update(['druft' => 1]);
+            }
+
+            if ($currentDateTime <= $endDateTime) {
+                $discount->update(['druft' => 0, 'status' => 0]);
+            }
+        }
     }
 }
