@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Log;
 use App\Models\Size;
 use App\Models\Brand;
 use App\Models\Color;
@@ -11,9 +12,11 @@ use App\Models\ProductQty;
 use App\Models\ProductSEO;
 use App\Models\SubCategory;
 use Illuminate\Support\Str;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use App\Models\ChildCategory;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Facades\Image;
@@ -25,9 +28,10 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('productQtys')->get();
+        $products = Product::with('productQtys','discounts')->get();
         return view('admin.pages.product.index', compact('products'));
     }
+    
 
     public function createProductPage()
     {
@@ -45,55 +49,76 @@ class ProductController extends Controller
             'product_id' => 'required|unique:products,product_id',
             'weight' => 'nullable|string',
             'minimum_purchase' => 'required|string',
-            'tags' => 'required|string',
             'thum_img' => 'required|image|mimes:jpeg,png,webp,jpg|max:2048',
-            'description' => 'required|string',
+            'short_des' => 'required|string',
             'category_id' => 'required'
         ]);
 
-        // Create a new Product instance
-        $product = new Product;
+        DB::beginTransaction();
 
-        // Assign values from the request to the Product instance
-        $product->title = $request->title;
-        $product->slug = Str::slug($request->title, '-');
-        $product->product_id = '#' . $request->product_id;
-        $product->brand_id = $request->brand_id;
-        $product->cat_id = $request->category_id;
-        $product->subCat_id = $request->subCat_id;
-        $product->childCat_id = $request->childCat_id;
-        $product->weight = $request->weight;
-        $product->minimum_purchase = $request->minimum_purchase;
-        $product->tags = $request->tags;
-        $product->barcode = $request->barcode;
-        $product->description = $request->description;
-        $product->related_product = $request->product_id;
+        try {
+            $product = new Product;
+            $product->title = $request->title;
+            $product->slug = Str::slug($request->title, '-');
+            $product->product_id = '#' . $request->product_id;
+            $product->brand_id = $request->brand_id;
+            $product->cat_id = $request->category_id;
+            $product->subCat_id = $request->subCat_id;
+            $product->childCat_id = $request->childCat_id;
+            $product->weight = $request->weight;
+            $product->short_des = $request->short_des;
+            $product->minimum_purchase = $request->minimum_purchase;
+            $product->barcode = $request->barcode;
+            $product->description = $request->description;
+            $product->related_product = $request->related_products;
 
-        // Set refundable and cash_on_delivary based on request data
-        $product->refundable = $request->has('refundable') ? 1 : 0;
-        $product->cash_on_delivary = $request->has('cash_on_delivary') ? 1 : 0;
+            $product->refundable = $request->has('refundable') ? 1 : 0;
+            $product->cash_on_delivary = $request->has('cash_on_delivary') ? 1 : 0;
 
-        // Handle product thumbnail image upload
-        $product->thum_img = 'files/product/' . $this->handleImageUpload($request->file('thum_img'), 'public/files/product/');
+            $product->thum_img = 'files/product/' . $this->handleImageUpload($request->file('thum_img'), 'public/files/product/');
+            // Save the product
+            $product->save();
+            // Create and save SEO properties for the product
+            $tagsJson = json_encode($request->tags);
+            $seoProperty = new ProductSEO;
+            $seoProperty->product_id = $product->id;
+            $seoProperty->meta_title = $request->meta_title;
+            $seoProperty->meta_des = $request->meta_des;
+            $seoProperty->meta_slug = $request->meta_slug;
+            $seoProperty->tags = $tagsJson;
 
-        // Save the product
-        $product->save();
+            // dd($product->id);
+            // Handle SEO thumbnail image upload
+            if ($request->meta_img) {
 
-        // Create and save SEO properties for the product
-        $seoProperty = new ProductSEO;
-        $seoProperty->product_id = $product->id;
-        $seoProperty->meta_title = $request->meta_title;
-        $seoProperty->meta_des = $request->meta_des;
-        $seoProperty->meta_slug = $request->meta_slug;
+                $seoProperty->meta_img = 'files/product_seo/' . $this->handleImageUpload($request->file('meta_img'), 'public/files/product_seo/');
+            }
+            $seoProperty->save();
 
-        // Handle SEO thumbnail image upload
-        $seoProperty->meta_img = 'files/product_seo/' . $this->handleImageUpload($request->file('meta_img'), 'public/files/product_seo/');
+            // Handle product images upload
+            if ($request->has('images')) {
+                foreach ($request->file('images') as $image) {
+                    $productImg = new ProductImage;
+                    $productImg->product_id = $product->id;
+                    $productImg->product_img = 'files/product_Img/' . $this->handleImageUpload($image, 'public/files/product_Img/');
+                    $productImg->save();
+                }
+            }
 
-        $seoProperty->save();
+            // Commit the transaction
+            DB::commit();
 
-        // Redirect back with a success message
-        $notification = ['message' => 'Brand Inserted!', 'alert-type' => 'success'];
-        return redirect()->route('products.index')->with($notification);
+            // Redirect back with a success message
+            $notification = ['message' => 'Product Inserted!', 'alert-type' => 'success'];
+            return redirect()->route('products.index')->with($notification);
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            // Log the error
+            // Log::error("sjkdhfus" . $e);
+            $notification = ['message' => 'Failed to insert product!', 'alert-type' => 'error'];
+            return redirect()->back()->withInput()->with($notification);
+        }
     }
 
 
@@ -103,16 +128,25 @@ class ProductController extends Controller
         $categories = Category::get();
         $brands = Brand::get();
         $product = Product::find($productId);
+        $relatedProducts = [];
+
+        if (!empty($product->related_product)) {
+            if (is_string($product->related_product)) {
+                $relatedProducts[] = $product->related_product;
+            } elseif (is_array($product->related_product)) {
+                $relatedProducts = $product->related_product;
+            }
+        }
         $seoProperty = ProductSEO::find($productId);
-        return view('admin.pages.product.editeProduct', compact('product', 'categories', 'brands', 'seoProperty'));
+        $images = ProductImage::where('product_id', $productId)->get();
+
+        return view('admin.pages.product.editeProduct', compact('product', 'categories', 'brands', 'images', 'seoProperty', 'relatedProducts'));
     }
 
 
     public function updateProduct(Request $request, $productId)
     {
-
-        // dd($product_id);
-        // Validate request data
+        // dd($request->cash_on_delivary);
         $request->validate([
             'title' => 'required|string',
             'product_id' => [
@@ -121,74 +155,79 @@ class ProductController extends Controller
             ],
             'weight' => 'nullable|string',
             'minimum_purchase' => 'required|string',
-            'tags' => 'required|string',
-            'description' => 'required|string',
+            'short_des' => 'required|string',
             'category_id' => 'required'
         ]);
-        $product_id = str_replace('#', '', $request->product_id);
-        // Find the product
-        $product = Product::find($productId);
 
-        // Update the product attributes
-        $product->update([
-            'title' => $request->title,
-            'slug' => Str::slug($request->title, '-'),
-            'product_id' => '#' . $product_id,
-            'brand_id' => $request->brand_id,
-            'cat_id' => $request->category_id,
-            'subCat_id' => $request->subCat_id,
-            'childCat_id' => $request->childCat_id,
-            'weight' => $request->weight,
-            'minimum_purchase' => $request->minimum_purchase,
-            'tags' => $request->tags,
-            'barcode' => $request->barcode,
-            'description' => $request->description,
-            'related_product' => $request->product_id,
+        DB::beginTransaction();
 
-            // Set refundable and cash_on_delivary based on request data
-            'refundable' => $request->has('refundable') ? 1 : 0,
-            'cash_on_delivary' => $request->has('cash_on_delivary') ? 1 : 0,
-        ]);
+        try {
+            $product = Product::findOrFail($productId);
+            // dd($product->cash_on_delivary);
 
+            $product->update([
+                'title' => $request->title,
+                'slug' => Str::slug($request->title, '-'),
+                'product_id' => '#' . str_replace('#', '', $request->product_id),
+                'brand_id' => $request->brand_id,
+                'cat_id' => $request->category_id,
+                'subCat_id' => $request->subCat_id,
+                'childCat_id' => $request->childCat_id,
+                'weight' => $request->weight,
+                'minimum_purchase' => $request->minimum_purchase,
+                'tags' => $request->tags,
+                'barcode' => $request->barcode,
+                'description' => $request->description,
+                'related_product' => $request->related_products,
+                'cash_on_delivary' => $request->filled('cash_on_delivary'),
+                'refundable' => $request->filled('refundable'),
+            ]);
 
-        if ($request->thum_img) {
-            $imagePath = public_path('storage/' . $request->oldThum);
-            if (File::exists($imagePath)) {
-                unlink($imagePath);
-            }
-            // dd($request->thum_img);
-            // Working with image
-            $newThum_img = 'files/product/' . $this->handleImageUpload($request->file('thum_img'), 'public/files/product/');
-            // dd($newThum_img);
-            $product->update(['thum_img' => $newThum_img]);
-        } else {
-            $product->update(['thum_img' =>  $request->oldThum]);
-        }
-
-        $productSeo = ProductSEO::where('product_id', $productId)->first();
-
-        $productSeo->update([
-            'meta_title' => $request->meta_title,
-            'meta_des' => $request->meta_des,
-            'meta_slug' => $request->meta_slug,
-        ]);
-        // Handle SEO thumbnail image update
-
-        if ($request->hasFile('meta_img')) {
-            // Check if old image exists and delete it
-            $oldImagePath = public_path('storage/' . $request->oldMeta_img);
-            if (File::exists($oldImagePath)) {
-                unlink($oldImagePath);
+            // Handle thumbnail image update
+            if ($request->hasFile('thum_img')) {
+                $oldThumPath = public_path('storage/' . $product->thum_img);
+                if (File::exists($oldThumPath)) {
+                    unlink($oldThumPath);
+                }
+                $product->update(['thum_img' => 'files/product/' . $this->handleImageUpload($request->file('thum_img'), 'public/files/product/')]);
             }
 
-            // Working with new image
-            $newMeta_img = 'files/product_seo/' . $this->handleImageUpload($request->file('meta_img'), 'public/files/product_seo/');
-            $productSeo->update(['meta_img' => $newMeta_img]);
-        } else {
-            // No new image provided, retain the old one
-            $product->update(['meta_img' => $request->oldMeta_img]);
+            // Update product SEO attributes
+            $productSeo = ProductSEO::where('product_id', $productId)->first();
+            $productSeo->update([
+                'meta_title' => $request->meta_title,
+                'meta_des' => $request->meta_des,
+                'meta_slug' => $request->meta_slug,
+                'meta_img' => $request->hasFile('meta_img') ? 'files/product_seo/' . $this->handleImageUpload($request->file('meta_img'), 'public/files/product_seo/') : $request->oldMeta_img,
+            ]);
+
+            // Delete unused product images
+            $allImages = ProductImage::where('product_id', $productId)->pluck('product_img')->toArray();
+            $unusedImages = array_diff($allImages, (array)$request->old_images);
+            foreach ($unusedImages as $unusedImage) {
+                $imagePath = public_path('storage/' . $unusedImage);
+                if (File::exists($imagePath)) {
+                    unlink($imagePath);
+                }
+                ProductImage::where('product_img', $unusedImage)->delete();
+            }
+
+            // Add new product images
+            if ($request->has('images')) {
+                foreach ($request->file('images') as $newImage) {
+                    ProductImage::create([
+                        'product_id' => $productId,
+                        'product_img' => 'files/product_Img/' . $this->handleImageUpload($newImage, 'public/files/product_Img/')
+                    ]);
+                }
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->withErrors(['message' => 'Failed to update product. Please try again.'])->withInput();
         }
-        // Redirect back with a success message
+
         $notification = ['message' => 'Product updated successfully!', 'alert-type' => 'success'];
         return redirect()->back()->with($notification);
     }
@@ -371,7 +410,20 @@ class ProductController extends Controller
     }
 
 
+    public function productsByName(Request $request)
+    {
+        $query = $request->input('query');
 
+        // Search for products by title
+        $products = Product::where('title', 'like', "%" . $query . "%")
+            ->get();
+
+        if ($products->isEmpty()) {
+            return response()->json(['message' => 'No products found.']);
+        }
+
+        return response()->json($products);
+    }
 
 
 

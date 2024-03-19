@@ -19,19 +19,20 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('backend/plugins/toastr/toastr.css') }}">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+
+    <link rel="stylesheet" href="{{ asset('backend') }}/plugins/summernote/summernote-bs4.min.css">
+
+    <!-- jQuery -->
+    <script src="{{ asset('backend') }}/plugins/jquery/jquery.min.js"></script>
     <!-- DataTables -->
     <link rel="stylesheet" href="{{ asset('backend') }}/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="{{ asset('backend') }}/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet"
+        href="{{ asset('backend') }}/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
     <link rel="stylesheet" href="{{ asset('backend') }}/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-
-    {{-- dropify.css --}}
-    {{-- <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.css">
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.js"></script> --}}
-
+    @yield('custon_css')
 </head>
 
 <body>
@@ -61,26 +62,26 @@
 
         </div>
     </div>
-    <!-- ./wrapper -->
 
-    <!-- REQUIRED SCRIPTS -->
-    <!-- jQuery -->
-    <script src="{{ asset('backend') }}/plugins/jquery/jquery.min.js"></script>
+
+
     <!-- Bootstrap -->
     <script src="{{ asset('backend') }}/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- overlayScrollbars -->
     <script src="{{ asset('backend') }}/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
     <!-- AdminLTE App -->
     <script src="{{ asset('backend') }}/dist/js/adminlte.js"></script>
-
-    <!-- PAGE PLUGINS -->
+<!-- PAGE PLUGINS -->
     <!-- jQuery Mapael -->
-    <script src="{{ asset('backend') }}/plugins/jquery-mousewheel/jquery.mousewheel.js"></script>
+    <script src="{{ asset('backend') }}/plugins/jquery-mousewheel/jquery.mousewheel.js"></script>{{--  --}}
     <script src="{{ asset('backend') }}/plugins/raphael/raphael.min.js"></script>
     <script src="{{ asset('backend') }}/plugins/jquery-mapael/jquery.mapael.min.js"></script>
     <script src="{{ asset('backend') }}/plugins/jquery-mapael/maps/usa_states.min.js"></script>
     <!-- ChartJS -->
     <script src="{{ asset('backend') }}/plugins/chart.js/Chart.min.js"></script>
+
+    <!-- Summernote -->
+    <script src="{{ asset('backend') }}/plugins/summernote/summernote-bs4.min.js"></script>
 
     <!-- AdminLTE for demo purposes -->
     <script src="{{ asset('backend') }}/dist/js/demo.js"></script>
@@ -88,8 +89,22 @@
     <script src="{{ asset('backend') }}/dist/js/pages/dashboard2.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script type="text/javascript" src="{{ asset('backend/plugins/toastr/toastr.min.js') }}"></script>
+
+
+    <!-- DataTables  & Plugins -->
+    <script src="{{ asset('backend') }}/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="{{ asset('backend') }}/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="{{ asset('backend') }}/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="{{ asset('backend') }}/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="{{ asset('backend') }}/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="{{ asset('backend') }}/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="{{ asset('backend') }}/plugins/jszip/jszip.min.js"></script>
+    <script src="{{ asset('backend') }}/plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="{{ asset('backend') }}/plugins/pdfmake/vfs_fonts.js"></script>
+    <script src="{{ asset('backend') }}/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="{{ asset('backend') }}/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="{{ asset('backend') }}/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 
     <script>
         $(document).on("click", "#delete", function(e) {
@@ -112,9 +127,6 @@
             });
         });
     </script>
-
-
-
     <script>
         @if (Session::has('message'))
             var type = "{{ Session::get('alert-type', 'info') }}";
@@ -134,25 +146,7 @@
             }
         @endif
     </script>
-
-    <!-- DataTables  & Plugins -->
-    <script src="{{ asset('backend') }}/plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="{{ asset('backend') }}/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <script src="{{ asset('backend') }}/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="{{ asset('backend') }}/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-    <script src="{{ asset('backend') }}/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="{{ asset('backend') }}/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-    <script src="{{ asset('backend') }}/plugins/jszip/jszip.min.js"></script>
-    <script src="{{ asset('backend') }}/plugins/pdfmake/pdfmake.min.js"></script>
-    <script src="{{ asset('backend') }}/plugins/pdfmake/vfs_fonts.js"></script>
-    <script src="{{ asset('backend') }}/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-    <script src="{{ asset('backend') }}/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-    <script src="{{ asset('backend') }}/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-
     @yield('custom_js')
-
-
-
 
 </body>
 

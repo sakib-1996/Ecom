@@ -1,5 +1,4 @@
 @extends('admin.layouts.app')
-
 @section('admin_contant')
     <div class="p-3">
         <form action="{{ url()->current() }}" method="POST" enctype="multipart/form-data">
@@ -66,7 +65,6 @@
                     <div class="card">
                         <div class="card-body">
                             <h4>Product Attributes</h4>
-
                             <!-- Size -->
                             <div class="mb-4">
                                 <div class="form-group">

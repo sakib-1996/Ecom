@@ -21,7 +21,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header bg-dark">
                             <h3 class="card-title">All Brand List Here</h3>
                         </div>
                         <!-- /.card-header -->

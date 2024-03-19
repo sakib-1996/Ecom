@@ -25,7 +25,7 @@ return new class extends Migration
 
             $table->string('weight')->nullable();
             $table->string('minimum_purchase')->nullable();
-            $table->longText('tags')->nullable();
+
             $table->string('barcode')->nullable();
             $table->boolean('refundable')->default(false);
             $table->boolean('cash_on_delivary')->default(false);
@@ -34,6 +34,7 @@ return new class extends Migration
             $table->json('related_product')->nullable();
             $table->boolean('status')->default(false);
             $table->boolean('druft')->default(false);
+            $table->longText('short_des')->nullable();
 
             $table->timestamps();
             $table->foreign('brand_id')->references('id')->on('brands')->onDelete('cascade')->onUpdate('cascade');

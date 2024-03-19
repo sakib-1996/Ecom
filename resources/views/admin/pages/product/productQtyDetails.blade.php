@@ -12,7 +12,6 @@
             </div>
         </div><!-- /.container-fluid -->
     </section>
-
     <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
@@ -28,12 +27,11 @@
                                 <div class="col-sm-6">
                                     <ol class="breadcrumb float-sm-right">
                                         <a href="{{ route('products.addQty', $product->id) }}" class="btn btn-primary"> +
-                                            Add New</a>
+                                            Add Quantity</a>
                                     </ol>
                                 </div>
                             </div>
                         </div>
-                        <!-- /.card-header -->
                         <div class="card-body">
                             <table id="example1" class="table table-bordered table-hover table-striped table-sm">
                                 <thead>
@@ -64,7 +62,6 @@
 
                                         $sortedProductQtys = $nonZeroQtyItems->concat($zeroQtyItems)->values();
                                     @endphp
-
                                     @foreach ($sortedProductQtys as $key => $productQty)
                                         <tr>
                                             <td>{{ $key + 1 }}</td>
@@ -98,10 +95,6 @@
                                                             for="status-{{ $productQty->id }}"></label>
                                                     </div>
                                                 </form>
-
-
-
-
                                                 @if ($productQty->druft === 0)
                                                     <div class="badge badge-warning ml-1">Druft</div>
                                                 @else
@@ -126,22 +119,14 @@
                                             </td>
                                         </tr>
                                     @endforeach
-
                                 </tbody>
                             </table>
                         </div>
-                        <!-- /.card-body -->
                     </div>
-                    <!-- /.card -->
                 </div>
-                <!-- /.col -->
             </div>
-            <!-- /.row -->
         </div>
-        <!-- /.container-fluid -->
     </section>
-    <!-- /.content -->
-
     <!-- Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -155,8 +140,6 @@
                 <form action="{{ route('products.QtyUpdate') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body p-4">
-
-
                         <div class="">
                             <input type="" name="id" id="qtyUpdateId">
                             <div>
@@ -166,7 +149,6 @@
                                 <input type="text" class="form-control" id="qty" name="qty">
                             </div>
                         </div>
-
                         <div class="">
                             <div>
                                 <label class="text-muted" for="unit_price">Unit Price</label>
@@ -192,7 +174,6 @@
                                     placeholder="kg/pc">
                             </div>
                         </div>
-
                         <!-- Size -->
                         <div class="mb-4">
                             <div class="form-group">
@@ -207,7 +188,6 @@
 
                             </div>
                         </div>
-
                         <!-- Color -->
                         <div class="form-group">
                             <label class="text-muted" for="color_id">Color</label>
@@ -219,9 +199,6 @@
                             </select>
 
                         </div>
-
-
-
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -231,12 +208,6 @@
             </div>
         </div>
     </div>
-
-
-
-
-
-
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.js"></script>

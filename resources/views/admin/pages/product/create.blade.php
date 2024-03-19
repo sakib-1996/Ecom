@@ -1,4 +1,8 @@
 @extends('admin.layouts.app')
+@section('custon_css')
+    <link rel="stylesheet" href="{{ asset('backend/dropjoze.css') }}">
+    <link rel="stylesheet" href="{{ asset('backend') }}/plugins/select2/css/select2.min.css">
+@endsection
 @section('admin_contant')
     <div class="p-3">
         <form action="{{ url()->current() }}" method="POST" enctype="multipart/form-data">
@@ -12,8 +16,9 @@
                                     <label class="text-muted" for="title">Title*</label>
                                 </div>
                                 <div class="col-9">
-                                    <input type="text" class="form-control @error('title') is-invalid @enderror"
-                                        id="title" name="title">
+                                    <input type="text" value="{{ old('title') }}"
+                                        class="form-control @error('title') is-invalid @enderror" id="title"
+                                        name="title">
                                     @error('title')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -29,7 +34,7 @@
                                 </div>
                                 <div class="col-9">
                                     <input type="text" class="form-control @error('product_id') is-invalid @enderror"
-                                        id="product_id" name="product_id">
+                                        id="product_id" name="product_id" value="{{ old('product_id') }}">
                                     @error('product_id')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -44,7 +49,8 @@
                                     <label class="text-muted" for="weight">Weight</label>
                                 </div>
                                 <div class="col-9">
-                                    <input type="text" class="form-control" id="weight" name="weight">
+                                    <input type="text" value="{{ old('weight') }}" class="form-control" id="weight"
+                                        name="weight">
                                     <small id="emailHelp" class="form-text text-muted">This is your main weight</small>
                                 </div>
                             </div>
@@ -56,48 +62,35 @@
                                 <div class="col-9">
                                     <input type="text"
                                         class="form-control @error('minimum_purchase') is-invalid @enderror"
-                                        id="minimum_purchase" name="minimum_purchase">
+                                        id="minimum_purchase" name="minimum_purchase" value="{{ old('minimum_purchase') }}">
                                     @error('minimum_purchase')
                                         <div class="invalid-feedback">
                                             {{ $message }}
                                         </div>
                                     @enderror
                                 </div>
-
                             </div>
 
-                            <div class="row my-4">
-                                <div class="col-3">
-                                    <label class="text-muted" for="tags">Tags*</label>
-                                </div>
-                                <div class="col-9">
-                                    <input type="text" class="form-control @error('tags') is-invalid @enderror"
-                                        id="tags" name="tags">
-                                    @error('tags')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-
-                                </div>
-                            </div>
                             <div class="row my-4">
                                 <div class="col-3">
                                     <label class="text-muted" for="barcode">Barcode</label>
                                 </div>
                                 <div class="col-9">
-                                    <input type="text" class="form-control" id="barcode" name="barcode">
+                                    <input type="text" value="{{ old('barcode') }}" class="form-control" id="barcode"
+                                        name="barcode">
                                 </div>
                             </div>
 
-                            <div class="row my-4">
-                                <div class="col-3">
-                                    <label class="text-muted" for="thum_img">Thum Img*</label>
+                            <h4>--- Extra</h4>
+                            <hr>
+
+                            <div class="my-4">
+                                <div>
+                                    <label class="text-muted" for="short_des">Short Description*</label>
                                 </div>
-                                <div class="col-9">
-                                    <input type="file" class="form-control @error('thum_img') is-invalid @enderror"
-                                        id="thum_img" name="thum_img">
-                                    @error('thum_img')
+                                <div>
+                                    <textarea name="short_des" class="form-control @error('short_des') is-invalid @enderror" id="short_des">{{ old('short_des') }}</textarea>
+                                    @error('short_des')
                                         <div class="invalid-feedback">
                                             {{ $message }}
                                         </div>
@@ -105,13 +98,12 @@
                                 </div>
                             </div>
 
-                            <div class="row my-4">
-                                <div class="col-3">
-                                    <label class="text-muted" for="description">Description*</label>
+                            <div class="my-4">
+                                <div>
+                                    <label class="text-muted" for="description">Description</label>
                                 </div>
-                                <div class="col-9">
-                                    <textarea name="description"class="form-control @error('description') is-invalid @enderror" id="description"
-                                        rows="5"></textarea>
+                                <div>
+                                    <textarea name="description" class="form-control @error('description') is-invalid @enderror" id="description">{{ old('description') }}</textarea>
                                     @error('description')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -120,15 +112,18 @@
                                 </div>
                             </div>
 
-                            <div class="row my-4">
-                                <div class="col-3">
-                                    <label class="text-muted" for="e_category_name">Related Product</label>
-                                </div>
-                                <div class="col-9">
-                                    <input type="text" class="form-control" id="related_product"
-                                        name="related_product[]">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="text-muted" for="related-products">Related Products</label>
+                                    <div class="select2-purple">
+                                        <select id="related-products" name="related_products[]" class="select2"
+                                            multiple="multiple" data-placeholder="Select Related Products"
+                                            style="width: 100%;">
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                     <hr>
@@ -142,7 +137,7 @@
                                         <label class="text-muted" for="meta_title">Meta Title</label>
                                     </div>
                                     <div class="col-9">
-                                        <input type="text"
+                                        <input type="text" value="{{ old('meta_title') }}"
                                             class="form-control @error('meta_title') is-invalid @enderror" id="meta_title"
                                             name="meta_title">
                                         @error('meta_title')
@@ -152,31 +147,69 @@
                                         @enderror
                                     </div>
                                 </div>
+
                                 <div class="row mb-4">
                                     <div class="col-3">
                                         <label class="text-muted" for="meta_slug">Meta slug</label>
                                     </div>
                                     <div class="col-9">
-                                        <input type="text" class="form-control id="meta_title" name="meta_slug">
+                                        <input type="text"
+                                            class="form-control @error('meta_slug') is-invalid @enderror" id="meta_slug"
+                                            name="meta_slug" value="{{ old('meta_slug') }}">
+                                        @error('meta_slug')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
                                     </div>
                                 </div>
+
                                 <div class="row my-4">
-                                    <div class="col-3 my-auto">
-                                        <label class="text-muted" for="meta_des">Meta Description</label>
+                                    <div class="col-3">
+                                        <label class="text-muted" for="tags">Tags</label>
                                     </div>
                                     <div class="col-9">
-                                        <textarea class="form-control" name="meta_des" rows="5" cols="10" id="meta_des"></textarea>
+                                        <input type="text" class="form-control @error('tags') is-invalid @enderror"
+                                            id="tags" name="tags" value="{{ old('tags') }}">
+                                        @error('tags')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
                                     </div>
                                 </div>
+
+                                <div class="my-4">
+                                    <div class="my-auto">
+                                        <label class="text-muted" for="meta_des">Meta Description</label>
+                                    </div>
+                                    <div>
+                                        <textarea class="form-control @error('meta_des') is-invalid @enderror" name="meta_des" rows="5" cols="10"
+                                            id="meta_des">{{ old('meta_des') }}</textarea>
+                                        @error('meta_des')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+
 
                                 <div class="row my-4">
                                     <div class="col-3">
                                         <label class="text-muted" for="meta_img">Meta Images</label>
                                     </div>
                                     <div class="col-9">
-                                        <input type="file" class="form-control" id="meta_img" name="meta_img">
+                                        <input type="file" class="form-control @error('meta_img') is-invalid @enderror"
+                                            id="meta_img" name="meta_img">
+                                        @error('meta_img')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -187,15 +220,23 @@
                             <div class="mb-4">
                                 <div class="form-group">
                                     <label class="text-muted" for="category_id">Category</label>
-                                    <select class="form-control" name="category_id" id="category_id"
-                                        style="width: 100%;">
+                                    <select class="form-control @error('category_id') is-invalid @enderror"
+                                        name="category_id" id="category_id" style="width: 100%;">
                                         <option selected disabled>Select One</option>
                                         @foreach ($categories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->category_name }}</option>
+                                            <option value="{{ $category->id }}"
+                                                @if (old('category_id') == $category->id) selected @endif>
+                                                {{ $category->category_name }}</option>
                                         @endforeach
                                     </select>
+                                    @error('category_id')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
                             </div>
+
 
                             <div class="my-4">
                                 <div class="form-group">
@@ -249,6 +290,59 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label class="text-muted">Upload Tumbnail Image*</label>
+                                <input type="file" id="file" name="thum_img" accept="image/*" hidden>
+                                <div class="img-area" data-img="">
+                                    <i class='bx bxs-cloud-upload icon'></i>
+                                    <h3>Upload Tumbnail Image</h3>
+                                    <p>Image size must be image</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="btn btn-primary select-image">Select Image</div>
+                                </div>
+                            </div>
+                            @error('thum_img')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                            <hr>
+
+                            <div class="extra_img">
+                                <div class="d-flex custon_css justify-content-between">
+                                    <div>
+                                        <label class="" for="thum_img">Add Images</label>
+                                    </div>
+                                    <div id="actions">
+                                        <div class="btn-group" id="add">
+                                            <span class="btn btn-primary col fileinput-button">
+                                                <i class="fas fa-plus"></i>
+                                                <span>Add</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <table class="table table-bordered img_table" id="dynamic_field">
+                                        <div class="card-header">
+                                            <h3 class="card-title">More Images (Click Add For More Image)</h3>
+                                        </div>
+                                        <tr>
+                                            <td><input type="file" accept="image/*" name="images[]"
+                                                    class="form-control name_list" hidden /></td>
+                                            {{-- <td><button type="button" name="add" id="add"
+                                                    class="btn btn-success">Add</button></td> --}}
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="text-right mb-5">
@@ -259,6 +353,11 @@
 @endsection
 
 @section('custom_js')
+    <script src="{{ asset('backend/dropzone.js') }}"></script>
+    <!-- dropzonejs -->
+    <script src="{{ asset('backend') }}/plugins/dropzone/min/dropzone.min.js"></script>
+    <script src="{{ asset('backend') }}/plugins/select2/js/select2.full.min.js"></script>
+
     <script>
         $('#category_id').change(function() {
             var selectedCategoryId = $(this).val();
@@ -328,6 +427,105 @@
                             .hide();
                     }
                 });
+            });
+        });
+    </script>
+    <script>
+        $(function() {
+            $('#short_des').summernote({
+                height: 100, // Set height
+                toolbar: [
+                    ['style', ['bold', 'italic', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                ],
+            });
+        });
+        $(function() {
+            $('#description').summernote({
+                height: 200,
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            var i = 1;
+
+            $('#add').click(function() {
+                i++;
+                $('#dynamic_field').append(`<tr id="row${i}" class="dynamic-added">
+                    <td>
+                        <input type="file" accept="image/*" name="images[]" class="form-control name_list image_input" onchange="readURL(this, '#preview${i}');" />
+                        <img id="preview${i}" class="preview_image" width="100" height="100" style="display:none;">
+                    </td>
+                    <td style="width: 8%">
+                        <button type="button" name="remove" id="${i}" class="btn btn-danger btn_remove">X</button>
+                    </td>
+                </tr>`);
+
+            });
+
+            $(document).on('click', '.btn_remove', function() {
+                var button_id = $(this).attr("id");
+                $('#row' + button_id).remove();
+            });
+        });
+
+        function readURL(input, previewId) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $(previewId).attr('src', e.target.result).show();
+                    $(input).hide();
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+
+    <script>
+        $(function() {
+            //Initialize Select2 Elements
+            $('.select2').select2()
+
+            //Initialize Select2 Elements
+            $('.select2bs4').select2({
+                theme: 'bootstrap4'
+            })
+
+        })
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#related-products').select2({
+                ajax: {
+                    url: '{{ route('products.search') }}',
+                    type: 'GET',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            query: params.term,
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: $.map(data, function(item) {
+                                return {
+                                    id: item.id,
+                                    text: item.title
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                },
+                placeholder: 'Select Related Products',
+                minimumInputLength: 1
+            });
+
+            $('#myForm').submit(function() {
+                var selectedValues = $('#related-products').val();
+                $('#selected-values').val(JSON.stringify(selectedValues));
             });
         });
     </script>

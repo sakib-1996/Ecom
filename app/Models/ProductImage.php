@@ -5,21 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductSEO extends Model
+class ProductImage extends Model
 {
     use HasFactory;
-
     protected $fillable = [
-        'meta_title',
-        'meta_des',
-        'meta_img',
-        'meta_slug',
         'product_id',
-        'tags'
+        'product_img',
     ];
 
     public function product()
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->belongsTo(Product::class);
     }
 }

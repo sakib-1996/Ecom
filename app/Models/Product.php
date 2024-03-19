@@ -19,7 +19,6 @@ class Product extends Model
         'childCat_id',
         'weight',
         'minimum_purchase',
-        'tags',
         'barcode',
         'refundable',
         'cash_on_delivary',
@@ -27,7 +26,8 @@ class Product extends Model
         'description',
         'related_product',
         'status',
-        'druft'
+        'druft',
+        'short_des'
     ];
 
     protected $casts = [
@@ -55,12 +55,19 @@ class Product extends Model
     {
         return $this->belongsTo(ChildCategory::class, 'childCat_id');
     }
+
     public function productQtys()
     {
         return $this->hasMany(ProductQty::class);
     }
-    public function seo()
+    public function discounts()
     {
-        return $this->hasOne(ProductSEO::class);
+        return $this->hasMany(Discount::class);
     }
+
+    // public function seo()
+    // {
+    //     return $this->hasOne(ProductSEO::class);
+    // }
+
 }

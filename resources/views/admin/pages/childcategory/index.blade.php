@@ -22,7 +22,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header bg-dark">
                             <h3 class="card-title">All Child Categories List Hare</h3>
                         </div>
                         <!-- /.card-header -->

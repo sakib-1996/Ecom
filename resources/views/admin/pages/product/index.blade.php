@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>DataTables</h1>
+                    <h1>All Products</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -22,7 +22,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header bg-dark">
                             <h3 class="card-title">All Categories List Hare</h3>
                         </div>
                         <!-- /.card-header -->
@@ -30,7 +30,7 @@
                             <table id="example1" class="table table-bordered table-hover table-striped table-sm">
                                 <thead>
                                     <tr>
-                                        <th style="width: 3%">SL</th>
+                                        <th style="width: 5%">SL</th>
                                         <th style="width: 25%">Product Title</th>
                                         <th>Current Qty</th>
                                         <th>Base Price</th>
@@ -42,10 +42,18 @@
                                 <tbody>
                                     @foreach ($products as $key => $product)
                                         <tr>
-                                            <td>{{ $key + 1 }}</td>
-                                            <td>{{ $product->product_id }}</td>
+                                            <td>
+                                                {{ $key + 1 }}
+                                                @foreach ($product->discounts as $discount)
+                                                    @if ($discount->druft == 1)
+                                                        <i class="ml-2 text-success fa-solid fa-tags"></i>
+                                                    @break
+                                                @endif
+                                            @endforeach
+                                        </td>
 
-                                            @if ($product->productQtys && $product->productQtys->isNotEmpty())
+                                        <td>{{ $product->product_id }}</td>
+                                        @if ($product->productQtys && $product->productQtys->isNotEmpty())
                                             @foreach ($product->productQtys as $productQty)
                                                 @if ($productQty->current_qty != 0)
                                                     <td>{{ $productQty->current_qty }}
@@ -56,69 +64,83 @@
                                                         @endif
                                                     </td>
                                                     <td>{{ $productQty->unit_price }}</td>
-                                                    @break
-                                                @endif
-                                            @endforeach
-                                        @else
-                                            <!-- Handle the case when $product->productQtys is null or empty -->
-                                            <td>Undefine</td>
-                                            <td>Undefine</td>
-                                        @endif
-                                        
-                                        <td>
-                                            @if ($product->status == 0)
-                                                <span class="badge badge-danger ml-1">False</span>
-                                            @else
-                                                <span class="badge badge-success ml-1">True</span>
+                                                @break
                                             @endif
-                                        </td>
+                                        @endforeach
+                                    @else
+                                        <!-- Handle the case when $product->productQtys is null or empty -->
+                                        <td>Undefine</td>
+                                        <td>Undefine</td>
+                                    @endif
 
-                                        <td>
-                                            <form id="myForm-{{ $product->id }}"
-                                                action="{{ route('products.druft.update', $product->id) }}"
-                                                method="POST">
-                                                @csrf
-                                                <div class="custom-control custom-switch">
-                                                    <input class="custom-control-input druft-checkbox" type="checkbox"
-                                                        onclick="updateStatus({{ $product->id }})"
-                                                        id="status-{{ $product->id }}" data-id="{{ $product->id }}"
-                                                        {{ $product->druft == 1 ? 'checked' : '' }}>
-                                                    <label class="custom-control-label"
-                                                        for="status-{{ $product->id }}"></label>
-                                                </div>
-                                            </form>
-                                        </td>
+                                    <td>
+                                        @if ($product->status == 0)
+                                            <span class="badge badge-danger ml-1">False</span>
+                                        @else
+                                            <span class="badge badge-success ml-1">True</span>
+                                        @endif
+                                    </td>
 
-                                        <td class="text-right">
-                                            <a href="{{ route('editeProduct', $product->id) }}"
-                                                class="btn btn-info btn-sm edit mx-1">
-                                                <i class="fas fa-edit"></i></a>
+                                    <td>
+                                        <form id="myForm-{{ $product->id }}"
+                                            action="{{ route('products.druft.update', $product->id) }}"
+                                            method="POST">
+                                            @csrf
+                                            <div class="custom-control custom-switch">
+                                                <input class="custom-control-input druft-checkbox" type="checkbox"
+                                                    onclick="updateStatus({{ $product->id }})"
+                                                    id="status-{{ $product->id }}" data-id="{{ $product->id }}"
+                                                    {{ $product->druft == 1 ? 'checked' : '' }}>
+                                                <label class="custom-control-label"
+                                                    for="status-{{ $product->id }}"></label>
+                                            </div>
+                                        </form>
+                                    </td>
 
-                                            <a href="{{ route('deleteProduct', $product->id) }}"
-                                                class="btn btn-danger btn-sm mx-1" id="delete">
+                                    <td class="d-flex justify-content-end">
+                                        <a href="{{ route('editeProduct', $product->id) }}"
+                                            class="text-success edit mx-1">
+                                            <h5><i class="fas fa-edit"></i></h5>
+                                        </a>
+
+                                        <a href="{{ route('deleteProduct', $product->id) }}"
+                                            class="text-danger mx-4" id="delete">
+                                            <h5>
                                                 <i class="fas fa-trash"></i>
+                                            </h5>
+                                        </a>
+
+                                        <div class="btn-group dropleft">
+                                            <a class="text-info mx-2" type="button" id="dropdownMenuButton"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <h5><i class="fa fa-ellipsis-vertical"></i></h5>
                                             </a>
-                                            <a href="{{ route('products.QtyDetails', $product->id) }}"
-                                                class="btn btn-primary btn-sm mx-1">
-                                                <i class="fa-solid fa-table-list"></i>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item"
+                                                    href="{{ route('products.QtyDetails', $product->id) }}">Qty
+                                                    Details</a>
+                                                <a class="dropdown-item"
+                                                    href="{{ route('products.addQty', $product->id) }}">Add Qty</a>
+                                                <a class="dropdown-item"
+                                                    href="{{ route('products.disIndex', $product->id) }}">Discount</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
 
-                                        </td>
-                                    </tr>
-                                @endforeach
-
-
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- /.card-body -->
+                        </tbody>
+                    </table>
                 </div>
-                <!-- /.card -->
+                <!-- /.card-body -->
             </div>
-            <!-- /.col -->
+            <!-- /.card -->
         </div>
-        <!-- /.row -->
+        <!-- /.col -->
     </div>
-    <!-- /.container-fluid -->
+    <!-- /.row -->
+</div>
+<!-- /.container-fluid -->
 </section>
 <!-- /.content -->
 
